@@ -10,54 +10,24 @@ import com.capgemini.payment.service.WalletService;
 public class WalletServiceImpl implements WalletService {
 
 	WalletRepo walletRepo;
-	Customer customer;
-	Wallet wallet;
+	Customer customer =new Customer();
+	Wallet wallet = new Wallet();
 	
 	public WalletServiceImpl(WalletRepo walletRepo) {
 		this.walletRepo=walletRepo;
 	}
 
 	@Override
-	public Customer createAccount(String name, String mobileNo, BigDecimal amount) {
-		if(validateName(name))
-		{
-			
-		}
-		else if(validate(mobileNo))
-		{
-			
-		}
-		else
-		{
-			customer.setName(name);
-			customer.setMobileno(mobileNo);
-			wallet.setBalance(amount);
-			customer.setWallet(wallet);
-		}
+	public Customer createAccount(String name, String mobileNo, BigDecimal amount)
+	{
+		customer.setName(name);
+		customer.setMobileno(mobileNo);
+		wallet.setBalance(amount);
+		customer.setWallet(wallet);
 		if(walletRepo.save(customer))
-		{
 			return customer;
-		}
 		else
-		{
 			return null;
-		}
-	}
-
-	private boolean validate(String mobileNo) {
-		if(mobileNo.length()!=10)
-		{
-			return true;
-		}
-		else
-			return false;
-	}
-
-	private boolean validateName(String name) {
-		if(name==null)
-			return true;
-		else
-			return false;
 	}
 
 	@Override

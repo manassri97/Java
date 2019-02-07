@@ -22,4 +22,9 @@ public class Customer {
 	public void setWallet(Wallet wallet) {
 		this.wallet = wallet;
 	}
+	@Override
+	public String toString() {
+		return "Customer [name=" + name + ", mobileno=" + mobileno + ", wallet=" + wallet + "]";
+	}
+	
 }

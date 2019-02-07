@@ -11,4 +11,9 @@ public class Wallet {
 	public void setBalance(BigDecimal balance) {
 		this.balance = balance;
 	}
+	@Override
+	public String toString() {
+		return "Wallet [balance=" + balance + "]";
+	}
+	
 }
