@@ -15,5 +15,4 @@ public class Wallet {
 	public String toString() {
 		return "Wallet [balance=" + balance + "]";
 	}
-	
 }

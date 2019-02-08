@@ -1,13 +1,14 @@
 package com.capgemini.payment.exceptions;
 
-public class PhoneNumberAlreadyExist extends Exception {
+public class InsufficientWalletBalanceException extends Exception{
 
+	
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public PhoneNumberAlreadyExist(String string) {
+	public InsufficientWalletBalanceException(String string) {
 		super(string);
 	}
 

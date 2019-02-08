@@ -1,9 +1,13 @@
 package com.capgemini.payment.bl;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.capgemini.payment.bean.Customer;
+import com.capgemini.payment.bean.Transaction;
 import com.capgemini.payment.repo.WalletRepo;
 
 public class WalletRepoImpl implements WalletRepo {
@@ -22,8 +26,41 @@ public class WalletRepoImpl implements WalletRepo {
 
 	@Override
 	public Customer findOne(String mobileNo) {
-		// TODO Auto-generated method stub
-		return null;
+		if(hashMap.containsKey(mobileNo))
+		{
+			return hashMap.get(mobileNo);
+		}
+		else
+			return null;
+	}
+	
+	@Override
+	public boolean saveTransaction(Transaction transaction, Customer customer) {
+		List<Transaction> list = customer.getList();
+		list.add(transaction);
+		customer.setList(list);
+		hashMap.replace(customer.getMobileno(), customer);
+		return true;
 	}
 
+	@Override
+	public List<Transaction> retrieveTransaction(String tmobileNo) {
+		Customer customer =new Customer();
+		customer = hashMap.get(tmobileNo);
+		List<Transaction> list1 = customer.getList();
+		Collections.reverse(list1);
+		if(list1.size()<10)
+		{
+			return list1;
+		}
+		else
+		{
+			List<Transaction> list2 = new ArrayList<>();
+			for(int i=0;i<10;i++)
+			{
+				list2.add(customer.getList().get(i));
+			}
+			return list2;
+		}
+	}
 }

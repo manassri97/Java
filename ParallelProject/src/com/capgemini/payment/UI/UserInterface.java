@@ -1,93 +1,182 @@
 package com.capgemini.payment.UI;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
+import com.capgemini.payment.bean.Customer;
 import com.capgemini.payment.bl.WalletRepoImpl;
 import com.capgemini.payment.bl.WalletServiceImpl;
+import com.capgemini.payment.exceptions.InsufficientWalletBalanceException;
+import com.capgemini.payment.exceptions.PhoneNumberAlreadyExist;
+import com.capgemini.payment.exceptions.TransactionFailedException;
+import com.capgemini.payment.exceptions.WalletAccountDoesNotExist;
 import com.capgemini.payment.repo.WalletRepo;
 import com.capgemini.payment.service.WalletService;
 
 public class UserInterface {
-
+	private static Scanner sc = new Scanner(System.in);
 	static WalletRepo walletRepo = new WalletRepoImpl();
 	static WalletService walletService = new WalletServiceImpl(walletRepo);
-	private static Scanner sc = new Scanner(System.in);
+	
 	public static void main(String[] args) {
-		
+	
 		showMenu();
-	}
-	private static void showMenu() {
-		int choice;
-		choice = sc.nextInt();
-		sc.nextLine();
-		while(true)
-		{
-			System.out.println("1. Create Account \n"
-								+"2. Show Wallet Balance \n"
-								+"3. Fund Transfer to other Wallet \n"
-								+"4. Withdraw from wallet \n"
-								+"5. Deposit to wallet \n"
-								+"6. Exit");
-			switch(choice)
+		}
+	
+		private static void showMenu() {
+			int choice;
+			Customer customer = new Customer();
+			String mobileNo,mobileNo2,name;
+			BigDecimal balance;
+			while(true)
 			{
-				case 1 :System.out.println("enter the name of customer");
-						String name=sc.nextLine();
-						if(validateName(name))
-						{
-							System.out.println("enter the phone number of customer");
-							String mobileNo=sc.nextLine();
+				System.out.println("1. Create Account \n"
+									+"2. Show Wallet Balance \n"
+									+"3. Fund Transfer to other Wallet \n"
+									+"4. Withdraw from wallet \n"
+									+"5. Deposit to wallet \n"
+									+"6. Print Transactions \n"
+									+"7. Exit \n");
+				choice = sc.nextInt();
+				sc.nextLine();
+				switch(choice)
+				{
+					case 1 :System.out.println("enter the name of customer");
+							name=sc.nextLine();
+							if(validateName(name))
+							{
+								System.out.println("enter the phone number of customer");
+								mobileNo=sc.nextLine();
+								if(validateMobileNo(mobileNo))
+								{
+									System.out.println("enter the balance of customer");
+									balance=sc.nextBigDecimal();
+									
+									try {
+										customer = walletService.createAccount(name, mobileNo, balance);
+										System.out.println("Wallet Successfully Created \n"
+												+ "Name :"+customer.getName()+"\n"
+												+ "Mobile Number :"+customer.getMobileno()+"\n"
+												+ "Wallet Balance :"+customer.getWallet().getBalance()+"\n");
+									} catch (PhoneNumberAlreadyExist e) {
+										System.out.println(e.getMessage());
+									}
+									
+								}
+							}
+							break;
+					case 2 :System.out.println("enter the phone number of your wallet");
+							mobileNo=sc.nextLine();
 							if(validateMobileNo(mobileNo))
 							{
-								System.out.println("enter the balance of customer");
-								BigDecimal balance=sc.nextBigDecimal();
-								System.out.println(walletService.createAccount(name, mobileNo, balance));
+								try {
+									customer = walletService.showBalance(mobileNo);
+									System.out.println("Your Wallet balance :"+customer.getWallet().getBalance()+"\n");
+								} catch (WalletAccountDoesNotExist e) {
+									System.out.println(e.getMessage());
+								}
 							}
-						}
-						break;
-	
-//				case 2 :System.out.println("enter the name of customer");
-//						String name=sc.nextLine();
-//						System.out.println("enter the phone number of customer");
-//						String mobileNo=sc.nextLine();
-//						System.out.println("enter the balance of customer");
-//						BigDecimal balance=sc.nextBigDecimal();
-//						if(validateName(name) && validateMobileNo(mobileNo))
-//						{
-//							System.out.println(walletService.createAccount(name, mobileNo, balance));
-//						}
-//						else
-//						{
-//							break;
-//						}
-				}
+							break;
+					case 3 :System.out.println("enter the phone number of your wallet");
+							mobileNo=sc.nextLine();
+							if(validateMobileNo(mobileNo))
+							{
+								System.out.println("enter the phone number of wallet in which amount is to be transferred");
+								mobileNo2=sc.nextLine();
+								if(validateMobileNo(mobileNo2))
+								{
+									System.out.println("enter the amount to be transferred");
+									balance = sc.nextBigDecimal();
+									List<Customer> list = new ArrayList<>();
+									try {
+										list = walletService.fundTransfer(mobileNo, mobileNo2, balance);
+										System.out.println("Your Wallet balance :"+list+"\n");
+									} catch (InsufficientWalletBalanceException e){
+										System.out.println(e.getMessage());
+									} catch (WalletAccountDoesNotExist e) {
+										System.out.println(e.getMessage());
+									} catch (TransactionFailedException e) {
+										System.out.println(e.getMessage());
+									}
+								}
+							}
+							break;
+					case 4 :System.out.println("enter the phone number of your wallet");
+							mobileNo=sc.nextLine();
+							if(validateMobileNo(mobileNo))
+							{
+								System.out.println("enter the amount to be deducted");
+								balance = sc.nextBigDecimal();
+								try {
+									customer = walletService.withdrawAmount(mobileNo, balance);
+									System.out.println("Your Wallet balance :"+customer.getWallet().getBalance()+"\n");
+								} catch (InsufficientWalletBalanceException e) {
+									System.out.println(e.getMessage());
+								} catch (WalletAccountDoesNotExist e) {
+									System.out.println(e.getMessage());
+								} catch (TransactionFailedException e) {
+									System.out.println(e.getMessage());
+								}
+								
+							}
+							break;
+					case 5 :System.out.println("enter the phone number of your wallet");
+							mobileNo=sc.nextLine();
+							if(validateMobileNo(mobileNo))
+							{
+								System.out.println("enter the amount to be added");
+								balance = sc.nextBigDecimal();
+								try {
+									customer = walletService.depositAmount(mobileNo, balance);
+									System.out.println("Your Wallet balance :"+customer.getWallet().getBalance()+"\n");
+								} catch (WalletAccountDoesNotExist e) {
+									System.out.println(e.getMessage());
+								} catch (TransactionFailedException e) {
+									System.out.println(e.getMessage());
+								}
+								
+							}
+							break;
+					case 6 :System.out.println("enter the phone number to print transactions");
+							mobileNo=sc.next();
+							System.out.println(walletService.findTransaction(mobileNo));
+							break;
+					case 7 :System.exit(0);
+					default :System.out.println("Wrong choice selection");
+			}
 		}
 	}
 	private static boolean validateMobileNo(String mobileNo) {
 		char[] ch = mobileNo.toCharArray();
-		if(mobileNo!=null && mobileNo.length()==10)
+		if(mobileNo.length()!=10)
 		{
-			for(int i=0;i<ch.length;i++)
+			return false;
+		}
+		for(int i=0;i<ch.length;i++)
+		{
+			if(ch[i]<'0' || ch[i]>'9' || ch[i]==' ')
 			{
-				if(ch[i]<48 || ch[i]>57)
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 		return true;
 	}
+	
 	private static boolean validateName(String name) 
 	{
-		char[] ch = name.toLowerCase().toCharArray();
-		if(name==null)
+		name=name.toLowerCase();
+		char[] ch = name.toCharArray();
+		if(name.length()==0)
 		{
-			for(int i=0;i<ch.length;i++)
+			return false;
+		}
+		for(int i=0;i<ch.length;i++)
+		{
+			if(!((ch[i]>='a' && ch[i]<='z') || ch[i]==' '))
 			{
-				if(ch[i]<97 || ch[i]>112)
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 		return true;

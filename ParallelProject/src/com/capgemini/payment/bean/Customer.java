@@ -1,9 +1,12 @@
 package com.capgemini.payment.bean;
 
+import java.util.List;
+
 public class Customer {
 	private String name;
 	private String mobileno;
 	private Wallet wallet;
+	private List<Transaction> list;
 	public String getName() {
 		return name;
 	}
@@ -22,9 +25,15 @@ public class Customer {
 	public void setWallet(Wallet wallet) {
 		this.wallet = wallet;
 	}
+	
+	public List<Transaction> getList() {
+		return list;
+	}
+	public void setList(List<Transaction> list) {
+		this.list = list;
+	}
 	@Override
 	public String toString() {
-		return "Customer [name=" + name + ", mobileno=" + mobileno + ", wallet=" + wallet + "]";
+		return "Customer [name=" + name + ", mobileno=" + mobileno + ", wallet=" + wallet + ", list=" + list + "]";
 	}
-	
 }
